@@ -6,6 +6,7 @@ import {
   useCameraDevices,
   useFrameProcessor,
   CameraPosition,
+  CameraPermissionRequestResult,
 } from "react-native-vision-camera";
 import { scanOCR } from "vision-camera-ocr";
 
@@ -14,6 +15,9 @@ import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import { styles } from "./styles";
 
 export function Home() {
+  const [permission, setPermission] = useState<
+    CameraPermissionRequestResult | undefined
+  >();
   const [cameraPosition, setCameraPosition] = useState<CameraPosition>("back");
   const [text, setText] = useState<string>("");
 
@@ -28,15 +32,19 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    Camera.requestCameraPermission();
+    Camera.requestCameraPermission().then((result) => setPermission(result));
   }, []);
 
   function handleToggleCameraPosition() {
     setCameraPosition((prevState) => (prevState === "back" ? "front" : "back"));
   }
 
-  if (!device) {
-    return <ActivityIndicator color="blue" />;
+  if (!device || !permission) {
+    return (
+      <View style={styles.waiting}>
+        <ActivityIndicator color="#fff" />
+      </View>
+    );
   }
 
   return (
@@ -50,12 +58,14 @@ export function Home() {
         </TouchableOpacity>
       </View>
 
-      <Camera
-        style={styles.camera}
-        isActive={true}
-        device={device}
-        frameProcessor={frameProcessor}
-      />
+      {permission === "authorized" && (
+        <Camera
+          style={styles.camera}
+          isActive={true}
+          device={device}
+          frameProcessor={frameProcessor}
+        />
+      )}
 
       <View style={styles.content}>
         <Text style={styles.text}>{text}</Text>

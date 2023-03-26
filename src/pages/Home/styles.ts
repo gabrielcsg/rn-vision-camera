@@ -7,6 +7,12 @@ export const styles = StyleSheet.create({
   camera: {
     flex: 1,
   },
+  waiting: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#000",
+  },
   options: {
     position: "absolute",
     right: 24,
